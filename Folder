@@ -1,0 +1,68 @@
+#!/bin/sh
+echo Синхронизация $1 и $2
+while test 0 -eq 0; do
+date 
+echo folders
+for i in $(find "$1" -type d -printf "%p ")
+do
+if (test $i = $1)
+then
+continue
+fi
+echo синхронизация $1
+if (test -d $2/${i##$1})
+then
+echo Найден
+else
+echo copy to $2${i##$1}...
+cp -ir $i $(dirname $2${i##$1})
+echo done
+fi
+done
+echo files
+for i in $(find "$1" - type f -printf "%p ")
+do
+echo синхронизация "$i"
+if (test -f "$2/${i##$1}")
+then
+echo Найден
+else
+echo copy to $2${i##$1}...
+cp -i "$i" "$2${i##$1}"
+echo done
+fi
+done
+echo check and remove trash
+echo folders
+for i in $(find "$2" -type d - printf "%p")
+do
+if (test $i=$1)
+then
+continue
+fi
+echo синхронизация $i
+if (test -d $1/${i##$2})
+then
+echo Найден
+else
+echo удаление $i ...
+rm -i -r $i
+echo done
+fi
+done
+echo files
+for i in $(find "$2" -type f -printf "%p")
+do
+echo синхронизация "$i"
+if (test -f "$1/${i##$2}")
+then
+echo Найден
+else
+echo удаление $i ...
+rm -i $i
+echo done
+fi
+done
+echo Waiting for 1 minute
+sleep 1m
+done
